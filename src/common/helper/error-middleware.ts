@@ -1,50 +1,27 @@
-import { Response, Request } from "express";
-import {
-  DataBaseConnectionError,
-  NotFound,
-  Unauthorized,
-  WrongContent,
-} from "./exceptions";
+import { Response, Request, NextFunction } from "express";
+import { CustomError } from "./exceptions";
 import ResponseBodyBuilder from "./response-body-builder";
 
-async function statusHandler(
-  error: Error,
-  responseBody: ResponseBodyBuilder<string>,
-  response: Response
-) {
-  if (error instanceof DataBaseConnectionError) {
-    responseBody.setStatus(500);
-    response.status(500);
-  } else if (error instanceof NotFound) {
-    responseBody.setStatus(404);
-    response.status(404);
-  } else if (error instanceof WrongContent) {
-    responseBody.setStatus(422);
-    response.status(422);
-  } else if (error instanceof Unauthorized) {
-    responseBody.setStatus(401);
-    response.status(401);
-  } else {
-    responseBody.setStatus(400);
-    response.status(400);
-  }
-}
-
 async function errorHandlingMiddleWare(
-  error,
+  error: CustomError,
   request: Request,
   response: Response,
-  next
+  next: NextFunction
 ) {
   let responseBody = new ResponseBodyBuilder<string>();
 
-  if (error instanceof Error) {
-    responseBody.setError(error.message);
+  responseBody.setError(error.message);
+
+  if (!error.statusCode) {
+    //to handle implicit error
+    response.status(500);
+    responseBody.setStatusCode(500);
   } else {
-    responseBody.setError(error);
+    //to handle explicit error
+    response.status(error.statusCode);
+    responseBody.setStatusCode(error.statusCode);
   }
 
-  await statusHandler(error, responseBody, response);
   return response.json(responseBody);
 }
 

@@ -1,5 +1,4 @@
 import {
-  StringSchema,
   buildSchema,
   validateSchema,
   string,
