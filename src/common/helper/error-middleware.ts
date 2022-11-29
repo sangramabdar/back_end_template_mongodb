@@ -25,4 +25,14 @@ async function errorHandlingMiddleWare(
   return response.json(responseBody);
 }
 
-export { errorHandlingMiddleWare };
+function invalidPathHandler(
+  request: Request,
+  response: Response,
+  next: NextFunction
+) {
+  response.status(404).json({
+    message: "invalid path",
+  });
+}
+
+export { errorHandlingMiddleWare, invalidPathHandler };

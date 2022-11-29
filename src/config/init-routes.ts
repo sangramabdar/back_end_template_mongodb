@@ -1,5 +1,8 @@
 import { app } from "./init-server";
-import { errorHandlingMiddleWare } from "../common/helper/error-middleware";
+import {
+  errorHandlingMiddleWare,
+  invalidPathHandler,
+} from "../common/helper/error-middleware";
 import RootController from "../modules/root/root.controller";
 import RootRouter from "../modules/root/root.router";
 import authRouter from "../modules/auth/auth.router";
@@ -11,7 +14,7 @@ async function initRoutes() {
   app.use("/", RootRouter);
   app.use("/api/auth", authRouter);
   app.use("/api/employees", employeeRouter);
-  app.use("*", RootController.wrongRoute);
+  app.use("*", invalidPathHandler);
 
   //global error handling middleware
   app.use(errorLogger);
