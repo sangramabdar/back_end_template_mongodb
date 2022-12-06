@@ -1,6 +1,7 @@
 import Express from "express";
 import cors from "cors";
-
+import swaggerUi from "swagger-ui-express";
+import swaggerDocument from "../../docs/swagger";
 import initRoutes from "./init-routes";
 
 import MongoDatabase from "./db";
@@ -18,6 +19,7 @@ async function initServer() {
     })
   );
   app.use(requestLogger);
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   await MongoDatabase.connectToDatabase();
   await initRoutes();
   app.listen(PORT, () => {
