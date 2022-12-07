@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { BadRequest } from "../../common/helper/exceptions";
 import { trimAllStrings } from "../../common/helper/utils";
 import {
   buildSchema,
@@ -22,19 +23,10 @@ const employeeDto = buildSchema<EmployeeDto>({
 async function validateEmployeeDto(request: Request, response: Response, next) {
   try {
     request.body = trimAllStrings(request.body);
-
-    if (request.method === "POST")
-      request.body = await validateSchema(
-        employeeDto,
-        request.body,
-        "complete"
-      );
-
-    if (request.method === "PUT")
-      request.body = await validateSchema(employeeDto, request.body, "partial");
-
+    request.body = await validateSchema(employeeDto, request.body, "complete");
     next();
   } catch (error) {
+    error = new BadRequest(error.message);
     next(error);
   }
 }

@@ -1,32 +1,43 @@
 import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
 import jwt from "jsonwebtoken";
+import { BadRequest } from "./exceptions";
 
 async function validateId(req: Request, res: Response, next) {
   let id = req.params["id"];
   let isValid = ObjectId.isValid(id);
   if (!isValid) {
-    return next("id is in wrong format");
+    let error = new BadRequest("id is in wrong format");
+    return next(error);
   }
   next();
 }
 
 async function validateBody(req: Request, res: Response, next) {
-  if (Object.keys(req.body).length == 0)
-    return next("body should not be empty");
+  if (Object.keys(req.body).length == 0) {
+    let error = new BadRequest("id is in wrong format");
+    return next(error);
+  }
+
   next();
 }
 
 async function validateToken(req: Request, res: Response, next) {
+  let error = new BadRequest();
   try {
     const token = req.headers["authorization"];
 
-    if (!token) return next("authorization header is not provided in headers");
+    if (!token) {
+      error.setMessage("authorization header is not provided in headers");
+      return next(error);
+    }
 
     const tokenPart = token.split(" ")[1];
 
-    if (!tokenPart)
-      return next("authorization header is not in correct format");
+    if (!tokenPart) {
+      error.setMessage("authorization header is not in correct format");
+      return next(error);
+    }
 
     const user = await verifyAccessToken(tokenPart);
 
@@ -34,7 +45,8 @@ async function validateToken(req: Request, res: Response, next) {
 
     next();
   } catch (error) {
-    next("token is invalid");
+    error = new BadRequest("token is invalid");
+    next(error);
   }
 }
 
@@ -78,32 +90,6 @@ async function verifyRefreshToken(token: string): Promise<jwt.JwtPayload> {
   return data;
 }
 
-async function validateAccess(req: Request, res: Response, next) {
-  const id = req.params["id"];
-  const { _id } = req.body.user;
-
-  if (id !== _id) {
-    return next("this token can not be used to access this route");
-  }
-
-  // let db = await Database.getDb();
-
-  // if (!db) {
-  //   return next(new DataBaseConnectionError());
-  // }
-
-  // to check user is present or not in db
-  // let result = await db?.collection("users").findOne({
-  //   _id: new ObjectId(id),
-  // });
-
-  // if (!result) {
-  //   return next(new Error("user is already deleted"));
-  // }
-  delete req.body.user;
-  next();
-}
-
 export {
   validateId,
   validateBody,
@@ -112,5 +98,4 @@ export {
   generateRefreshToken,
   verifyRefreshToken,
   verifyAccessToken,
-  validateAccess,
 };

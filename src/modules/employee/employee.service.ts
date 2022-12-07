@@ -71,8 +71,7 @@ async function checkEmployeeExistsOrNot(req: Request) {
   let id = req.params["id"];
   let employee = await getEmployeeById(id);
 
-  if (!employee) return false;
-  return true;
+  return employee ? true : false;
 }
 
 export {

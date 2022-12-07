@@ -4,6 +4,16 @@ class CustomError extends Error {
     super(message);
     this.statusCode = statusCode;
   }
+
+  setMessage(message: string) {
+    this.message = message;
+  }
+}
+
+class BadRequest extends CustomError {
+  constructor(message: string = "bad request") {
+    super(message, 400);
+  }
 }
 
 class DataBaseConnectionError extends CustomError {
@@ -55,4 +65,5 @@ export {
   NotRegistered,
   Unauthorized,
   CustomError,
+  BadRequest,
 };

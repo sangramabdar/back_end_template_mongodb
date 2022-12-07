@@ -6,12 +6,7 @@ import { EmployeeDto } from "./employee.dto";
 async function getAllEmployees() {
   let db = await Database.getDb();
 
-  let employees = await db
-    .collection("employees")
-    .find(
-      {}
-    )
-    .toArray();
+  let employees = await db.collection("employees").find({}).toArray();
 
   if (!employees) return null;
 

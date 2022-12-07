@@ -3,7 +3,6 @@ import {
   errorHandlingMiddleWare,
   invalidPathHandler,
 } from "../common/helper/error-middleware";
-import RootController from "../modules/root/root.controller";
 import RootRouter from "../modules/root/root.router";
 import authRouter from "../modules/auth/auth.router";
 import employeeRouter from "../modules/employee/employee.router";
